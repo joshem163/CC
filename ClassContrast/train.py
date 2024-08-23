@@ -8,8 +8,8 @@ import warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module="torch_geometric")
 # Parameter change to generate output
 runs=10
-dataset_name='cornell' # cora,texas,cornell, wisconsin
-Feature_ratio=0.37 #wis,cor=0.37,tx=0.46,cora=0.84,
+dataset_name='cornell'#cora,citeseer,texas,pubmed,wisconsin,chameleon,squirrel
+Feature_ratio=0.37 #wis,cor=0.37,tx=0.46,cora=0.84,pubmed,sq,cham=0.75
 #end parameter
 
 Accuracy_CC = []
@@ -29,13 +29,16 @@ for run in range(runs):
     Data = pd.concat([Domain_Fec, label], axis=1)
     Data.head()
     label = data.y.numpy()
-
+    if dataset_name=='squirrel':
+        Ir=0.01
+    else:
+        Ir=0.1
     Number_nodes = len(data.y)
     fe_len = len(data.x[0])
     catagories = Data['class'].to_numpy()
     data_by_class = {cls: Data.loc[Data['class'] == cls].drop(['class'], axis=1) for cls in range(max(catagories) + 1)}
     basis = [[max(df[i]) for i in range(len(df.columns))] for df in data_by_class.values()]
-    sel_basis = [[int(list(df[i].to_numpy()).count(1) >= int(len(df[i].index) * 0.1))
+    sel_basis = [[int(list(df[i].to_numpy()).count(1) >= int(len(df[i].index) * Ir))
                   for i in range(len(df.columns))]
                  for df in data_by_class.values()]
 
@@ -56,9 +59,12 @@ for run in range(runs):
     Train = np.concatenate((train_index, valid_index))
     #print('Run= ',run)
     F_vec = spatial_embeddings(Node_class, Edgelist, Number_nodes,label)
-
-    Fec, SFec = Contextual_embeddings(Data, basis, sel_basis, feature_names)
-    concatenated_list = np.concatenate((Fec, SFec, F_vec,), axis=1)
+    if dataset_name=='pubmed':
+        conxFec=ContextualPubmed(Domain_Fec)
+        concatenated_list = np.concatenate((conxFec, F_vec), axis=1)
+    else:
+        Fec, SFec = Contextual_embeddings(Data, basis, sel_basis, feature_names)
+        concatenated_list = np.concatenate((Fec, SFec, F_vec), axis=1)
     if dataset_name=='texas':
         acc_CC = ClassContrastTexas(concatenated_list, data.y, train_index, test_index, Feature_ratio,run)
     else:

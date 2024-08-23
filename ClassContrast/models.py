@@ -74,7 +74,22 @@ def Contextual_embeddings(DataFram, basis, sel_basis, feature_names):
 
     return Fec, SFec
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+def ContextualPubmed(DataAttribute):
+    # Scale data before applying PCA
+    scaling = StandardScaler()
 
+    # Use fit and transform method
+    scaling.fit(DataAttribute)
+    Scaled_data = scaling.transform(DataAttribute)
+
+    # Set the n_components=3
+    m = 100
+    principal = PCA(n_components=m)
+    principal.fit(Scaled_data)
+    x = principal.transform(Scaled_data)
+    return x
 
 def ClassContrast(attributes, labels, train_indices, test_indices,fr):
     feature = []
