@@ -36,13 +36,13 @@ def test(model, data, train_idx, valid_idx, test_idx):
 def main():
     parser = argparse.ArgumentParser(description='MLP Experiment')
     parser.add_argument('--device', type=int, default=0)
-    parser.add_argument('--dataset_name', type=str, default='squirrel')  # cora,pubmed,cornell
+    parser.add_argument('--dataset_name', type=str, default='cora')  # cora,pubmed,cornell
     parser.add_argument('--log_steps', type=int, default=1)
     parser.add_argument('--num_layers', type=int, default=2)
     parser.add_argument('--hidden_channels', type=int, default=100)
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--lr', type=float, default=0.001)
-    parser.add_argument('--epochs', type=int, default=200)
+    parser.add_argument('--epochs', type=int, default=400)
     parser.add_argument('--runs', type=int, default=10)
     args = parser.parse_args()
 
